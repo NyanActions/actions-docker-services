@@ -1,0 +1,29 @@
+# PLEASE READ THIS
+# https://github.com/KSPActions/actions-docker-services/blob/main/README.md
+# lets run searx for example.
+
+name: docker-service
+on: workflow_dispatch 
+
+jobs:
+  docker-service:
+    runs-on: ubuntu-latest
+
+    services:
+      searx:
+        image: searx/searx
+        ports:
+          - 8000:8080
+
+    steps:
+      - name: Install cloudflared
+        run: |
+          wget https://bin.equinox.io/c/VdrWdbjqyF/cloudflared-stable-linux-amd64.tgz
+          mkdir -p ../.cfd
+          tar -xvzf cloudflared-stable-linux-amd64.tgz -C ../.cfd
+          chmod -R 777 ../.cfd
+
+      - name: tunnel cloudflared
+        run: nohup ../.cfd/cloudflared tunnel --no-autoupdate --url http://localhost:8000 &
+
+      - run: sleep 350m
